@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"html/template"
 	"log"
 	"os"
@@ -53,11 +55,22 @@ func genFromTemplate() {
 		},
 		"Title": "Inventory list",
 	}
+	data, err := json.Marshal(d)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	f, err := os.Create("output.html")
 	if err != nil {
 		log.Fatalln("Output file create err:", err)
 	}
-	err = tmpl.Execute(f, d)
+	fmt.Println(string(data))
+
+	convertData := map[string]interface{}{}
+	err = json.Unmarshal(data, &convertData)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = tmpl.Execute(f, convertData)
 	if err != nil {
 		log.Fatalln("template execute failure:", err)
 	}
